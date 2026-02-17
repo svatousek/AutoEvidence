@@ -5,8 +5,168 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoEvidence"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Evidenční systém autobazaru" Height="600" Width="1000"
+        FontFamily="Segoe UI" Background="#FFF7F7F7">
 
+    <Window.Resources>
+        <!-- Jednoduchý styl pro nadpis panelu -->
+        <Style x:Key="PanelHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <!-- Datatemplate pro zobrazení řádku auta v ListView -->
+        <DataTemplate x:Key="CarItemTemplate">
+            <Grid Margin="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="60" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{Binding Model}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Make}" FontSize="12" Foreground="#666" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="{Binding LicensePlate}" 
+                           HorizontalAlignment="Left" VerticalAlignment="Center"
+                           FontFamily="Consolas" />
+
+                <Border Grid.Column="2" Width="36" Height="20" CornerRadius="3"
+                        Background="{Binding ColorBrush}" BorderBrush="#DDD" BorderThickness="1"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        ToolTip="{Binding Color}" />
+            </Grid>
+        </DataTemplate>
+
+        <!-- Template pro zobrazení detailu auta -->
+        <DataTemplate x:Key="CarDetailTemplate">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{Binding Model}" FontSize="18" FontWeight="Bold" />
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="SPZ:" FontWeight="SemiBold" Width="70"/>
+                    <TextBlock Text="{Binding LicensePlate}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Barva:" FontWeight="SemiBold" Width="70"/>
+                    <Border Width="40" Height="20" CornerRadius="3" Background="{Binding ColorBrush}" BorderBrush="#DDD" BorderThickness="1" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Color}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Rok:" FontWeight="SemiBold" Width="70"/>
+                    <TextBlock Text="{Binding Year}" />
+                    <TextBlock Text="   Najeto:" FontWeight="SemiBold" Margin="20,0,0,0"/>
+                    <TextBlock Text="{Binding Mileage}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Margin="0,12,0,0">
+                    <TextBlock Text="Poznámky:" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding Notes}" TextWrapping="Wrap" Foreground="#333"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Background="White" Padding="16" BorderBrush="#EEE" BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock Text="Evidenční systém autobazaru" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left"/>
+                <TextBlock Text="Přehled aut podle typu • Vyberte auto pro zobrazení detailu" Foreground="#666" Margin="12,0,0,0" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Obsah -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="360" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Levý panel: filtr -->
+            <Border Grid.Column="0" Background="White" CornerRadius="6" Padding="12" Margin="0,0,12,0" BorderBrush="#E6E6E6" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Filtr" Style="{StaticResource PanelHeader}" />
+                    <TextBlock Text="Typ auta" Foreground="#444" Margin="0,2,0,4"/>
+                    <ComboBox ItemsSource="{Binding Types}" SelectedItem="{Binding SelectedType}" Margin="0,0,0,8">
+                        <ComboBoxItem Content="Vše" />
+                        <!-- Pokud je v VM definováno, tak se použije dynamicky -->
+                    </ComboBox>
+
+                    <TextBlock Text="Hledat (model / SPZ)" Foreground="#444" Margin="0,8,0,4"/>
+                    <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="30" VerticalContentAlignment="Center"/>
+
+                    <Separator Margin="0,12,0,12"/>
+
+                    <TextBlock Text="Rychlý přehled" Style="{StaticResource PanelHeader}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Celkem aut:" Foreground="#666" Width="110"/>
+                        <TextBlock Text="{Binding TotalCount}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Zobrazeno:" Foreground="#666" Width="110"/>
+                        <TextBlock Text="{Binding VisibleCount}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Střední panel: seznam aut -->
+            <Border Grid.Column="1" Background="White" CornerRadius="6" Padding="8" Margin="0,0,12,0" BorderBrush="#E6E6E6" BorderThickness="1">
+                <DockPanel>
+                    <TextBlock Text="Seznam aut" Style="{StaticResource PanelHeader}" DockPanel.Dock="Top" Margin="4"/>
+                    <ListView x:Name="CarsList" ItemsSource="{Binding Cars}" 
+                              SelectedItem="{Binding SelectedCar, Mode=TwoWay}" 
+                              ItemTemplate="{StaticResource CarItemTemplate}"
+                              Margin="2" Background="Transparent" BorderThickness="0">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                    </ListView>
+                </DockPanel>
+            </Border>
+
+            <!-- Pravý panel: detail vybraného auta -->
+            <Border Grid.Column="2" Background="White" CornerRadius="6" Padding="12" BorderBrush="#E6E6E6" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Detail auta" Style="{StaticResource PanelHeader}" />
+                    <ContentControl Content="{Binding SelectedCar}" ContentTemplate="{StaticResource CarDetailTemplate}">
+                        <ContentControl.Style>
+                            <Style TargetType="ContentControl">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCar}" Value="{x:Null}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <TextBlock Text="Vyberte auto ze seznamu pro zobrazení detailu." Foreground="#666" TextWrapping="Wrap" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

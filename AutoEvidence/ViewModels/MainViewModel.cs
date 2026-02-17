@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using AutoEvidence.Helpers;
 using AutoEvidence.Models;
 using AutoEvidence.Services;
-using GalaSoft.MvvmLight.Command;
 
 namespace AutoEvidence.ViewModels
 {
@@ -25,9 +25,22 @@ namespace AutoEvidence.ViewModels
             }
         }
 
+        private CarItem? _selectedCar;
+        public CarItem? SelectedCar
+        {
+            get => _selectedCar;
+            set
+            {
+                _selectedCar = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand AddOwnerCommand { get; }
         public ICommand DeleteOwnerCommand { get; }
         public ICommand SaveCommand { get; }
+        public ICommand AddCarCommand { get; }
+        public ICommand DeleteCarCommand { get; }
 
         public MainViewModel()
         {
@@ -35,6 +48,8 @@ namespace AutoEvidence.ViewModels
             var data = _storage.LoadData();
 
             Owners = new ObservableCollection<Owner>(data.Owners);
+            AddCarCommand = new RelayCommand(AddCar);
+            DeleteCarCommand = new RelayCommand(DeleteCar);
 
             AddOwnerCommand = new RelayCommand(AddOwner);
             DeleteOwnerCommand = new RelayCommand(DeleteOwner);
@@ -58,6 +73,19 @@ namespace AutoEvidence.ViewModels
             {
                 Owners = new System.Collections.Generic.List<Owner>(Owners)
             });
+        }
+        private void AddCar()
+        {
+            if (SelectedOwner == null) return;
+
+            SelectedOwner.Cars.Add(new CarItem());
+        }
+
+        private void DeleteCar()
+        {
+            if (SelectedOwner == null || SelectedCar == null) return;
+
+            SelectedOwner.Cars.Remove(SelectedCar);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,27 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+﻿using System.Windows;
+using AutoEvidence.ViewModels;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace AutoEvidence.Views
 {
-    /// <summary>
-    /// Interakční logika pro CarDetailWindow.xaml
-    /// </summary>
     public partial class CarDetailWindow : Window
     {
         public CarDetailWindow()
         {
             InitializeComponent();
+
+            // TEST DATA – aby se ti to zobrazilo
+            DataContext = new CarViewModel
+            {
+                Make = "Škoda",
+                Model = "Octavia",
+                Year = 2020,
+                VIN = "TMBJJ7NE5L0123456",
+                LicensePlate = "1AB1234",
+                Mileage = 84500,
+                FuelType = "Diesel",
+                Transmission = "Automat",
+                OwnerName = "Jan Novák",
+                Status = "Aktivní",
+                ColorName = "Červená",
+                ColorHex = "#FF0000",
+                ColorBrush = Brushes.Red,
+                AvailabilityText = "Dostupné"
+            };
+        }
+
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }
