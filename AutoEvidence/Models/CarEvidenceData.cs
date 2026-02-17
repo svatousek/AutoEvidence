@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutoEvidence.Models
 {
-    internal class CarEvidenceData
+    public class CarEvidenceData
     {
         public List<Owner> Owners { get; set; } = new();
     }
